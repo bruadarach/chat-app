@@ -5,7 +5,6 @@ import generateTokenAndSetCookie from "../utils/generateToken.js";
 export const signup = async (req, res) => {
   try {
     const { fullName, username, password, confirmPassword, gender } = req.body;
-    console.log(req.body, "req.body");
 
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Password don't match" });
@@ -20,15 +19,21 @@ export const signup = async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
-    const profilePic =
-      "https://cdn.pixabay.com/photo/2016/08/31/11/54/icon-1633249_1280.png";
+    const maleProfilePics = `https://avatar.iran.liara.run/public/boy?username=${username}`;
+    const femaleProfilePics = `https://avatar.iran.liara.run/public/girl?username=${username}`;
+    const notPreferToSayProfilePics = `https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png`;
 
     const newUser = new User({
       fullName,
       username,
       password: hashedPassword,
       gender,
-      profilePic,
+      profilePic:
+        gender === "male"
+          ? maleProfilePics
+          : gender === "female"
+          ? femaleProfilePics
+          : notPreferToSayProfilePics,
     });
 
     await newUser.save();
